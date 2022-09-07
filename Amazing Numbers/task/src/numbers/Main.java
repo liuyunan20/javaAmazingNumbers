@@ -26,48 +26,29 @@ public class Main {
         return num % 2 == 0;
     }
 
-    static int checkBuzz(int num) {
-        if (num % 7 == 0 && num % 10 == 7) {
-            return 1;
-        } else if (num % 7 == 0) {
-            return 2;
-        } else if (num % 10 == 7) {
-            return 3;
-        } else {
-            return 4;
+    static boolean checkBuzz(int num) {
+        return num % 7 == 0 || num % 10 == 7;
+    }
+
+    static boolean checkDuck(int num) {
+        while (num / 10 > 0) {
+            if (num % 10 == 0) {
+                return true;
+            } else {
+                num /= 10;
+            }
         }
+        return false;
     }
 
     public static void main(String[] args) {
         int number = processInput();
         if (number != 0) {
-            if (checkParity(number)) {
-                System.out.println("This number is Even.");
-            } else {
-                System.out.println("This number is Odd.");
-            }
-            switch (checkBuzz(number)) {
-                case 1: {
-                    System.out.println("It is a Buzz number.");
-                    System.out.println("Explanation:");
-                    System.out.printf("%d is divisible by 7 and ends with 7.", number);
-                }
-                case 2: {
-                    System.out.println("It is a Buzz number.");
-                    System.out.println("Explanation:");
-                    System.out.printf("%d is divisible by 7.", number);
-                }
-                case 3: {
-                    System.out.println("It is a Buzz number.");
-                    System.out.println("Explanation:");
-                    System.out.printf("%d ends with 7.", number);
-                }
-                case 4: {
-                    System.out.println("It is not a Buzz number.");
-                    System.out.println("Explanation:");
-                    System.out.printf("%d is neither divisible by 7 nor does it end with 7.", number);
-                }
-            }
+            System.out.printf("Properties of %d\n", number);
+            System.out.printf("        even: %b\n", checkParity(number));
+            System.out.printf("         odd: %b\n", !checkParity(number));
+            System.out.printf("        buzz: %b\n", checkBuzz(number));
+            System.out.printf("        duck: %b\n", checkDuck(number));
         }
     }
 }
