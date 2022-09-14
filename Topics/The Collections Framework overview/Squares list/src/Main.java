@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
@@ -7,9 +6,7 @@ import java.util.stream.Collectors;
 class CollectionUtils {
 
     public static Collection<Integer> pow2(Collection<Integer> numbers) {
-        Collection<Integer> newNumbers = new ArrayList<>();
-        numbers.forEach(num -> newNumbers.add(num * num));
-        return newNumbers;
+        return numbers.stream().map(num -> (int) num * num).collect(Collectors.toList());
     }
 }
 
