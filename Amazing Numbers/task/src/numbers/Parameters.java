@@ -1,36 +1,30 @@
 package numbers;
 
 public class Parameters {
-    private Long startNumber;
-    private Long count;
-    private String property;
-    public Parameters(Long startNumber, Long count, String property) {
+    private final Long startNumber;
+    private final Long count;
+    private final String property1;
+    private final String property2;
+    public Parameters(Long startNumber, Long count, String property1, String property2) {
         this.startNumber = startNumber;
         this.count = count;
-        this.property = property;
+        this.property1 = property1;
+        this.property2 = property2;
     }
 
     public Long getStartNumber() {
         return startNumber;
     }
 
-    public void setStartNumber(Long startNumber) {
-        this.startNumber = startNumber;
-    }
-
     public Long getCount() {
         return count;
     }
 
-    public void setCount(Long count) {
-        this.count = count;
+    public String getProperty1() {
+        return property1;
     }
 
-    public String getProperty() {
-        return property;
-    }
-
-    public void setProperty(String property) {
-        this.property = property;
+    public String getProperty2() {
+        return property2;
     }
 }
