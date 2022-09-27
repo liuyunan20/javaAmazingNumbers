@@ -3,13 +3,12 @@ package numbers;
 public class Parameters {
     private final Long startNumber;
     private final Long count;
-    private final String property1;
-    private final String property2;
-    public Parameters(Long startNumber, Long count, String property1, String property2) {
+    private final String[] props;
+
+    public Parameters(Long startNumber, Long count, String[] props) {
         this.startNumber = startNumber;
         this.count = count;
-        this.property1 = property1;
-        this.property2 = property2;
+        this.props = props;
     }
 
     public Long getStartNumber() {
@@ -20,11 +19,7 @@ public class Parameters {
         return count;
     }
 
-    public String getProperty1() {
-        return property1;
-    }
-
-    public String getProperty2() {
-        return property2;
+    public String[] getProps() {
+        return props;
     }
 }

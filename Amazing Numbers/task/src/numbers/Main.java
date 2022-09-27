@@ -1,5 +1,6 @@
 package numbers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -23,8 +24,7 @@ public class Main {
         String[] input = scanner.nextLine().split(" ");
         Long num1 = checkNaturalNumber(input[0]);
         Long num2 = null;
-        String prop1 = null;
-        String prop2 = null;
+        String [] props = null;
         // check if the first number is natural or zero
         if (num1 < 0L) {
             System.out.println("The first parameter should be a natural number or zero.");
@@ -40,40 +40,45 @@ public class Main {
                 return null;
             }
         }
-        // check if the 3rd parameter is available number property
-        if (input.length == 3) {
-            prop1 = input[2];
-            if (!Arrays.asList(Number.properties).contains(prop1.toUpperCase())) {
-                System.out.printf("The property [%s] is wrong.", prop1.toUpperCase());
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY]");
+        // check if the input parameters are available number property
+        if (input.length > 2) {
+            props = Arrays.copyOfRange(input, 2, input.length);
+            ArrayList<String> wrongProp = new ArrayList<>();
+            // check if there is wrong property input
+            for (String prop: props) {
+                if (!Arrays.asList(Number.properties).contains(prop.toUpperCase())) {
+                    wrongProp.add(prop);
+                }
+            }
+            // if there is only one wrong property, print error message and return null
+            if (wrongProp.size() == 1) {
+                System.out.printf("The property [%s] is wrong.\n", wrongProp.get(0).toUpperCase());
+                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]");
                 return null;
+            }
+            // if wrong properties are more, print and return
+            if (wrongProp.size() > 1) {
+                StringBuilder errorMsg = new StringBuilder();
+                for (int i = 0; i < wrongProp.size() - 1; i++) {
+                    errorMsg.append(wrongProp.get(i)).append(", ");
+                }
+                errorMsg.append(wrongProp.get(wrongProp.size() - 1));
+                System.out.printf("The properties [%s] are wrong.\n", errorMsg.toString().toUpperCase());
+                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]\n");
+                return null;
+            }
+            // check if there are mutually exclusive properties
+            for (String p: props) {
+                if (Number.conflictProperties.containsKey(p.toLowerCase())
+                        && Arrays.asList(props).contains(Number.conflictProperties.get(p.toLowerCase()))) {
+                    System.out.printf("The request contains mutually exclusive properties: " +
+                            "[%s, %s]\n", p.toUpperCase(), Number.conflictProperties.get(p.toLowerCase()).toUpperCase());
+                    System.out.println("There are no numbers with these properties.\n");
+                    return null;
+                }
             }
         }
-        // check if the 3rd and 4th parameters are available number properties
-        if (input.length == 4) {
-            prop1 = input[2];
-            prop2 = input[3];
-            if (!Arrays.asList(Number.properties).contains(prop2.toUpperCase())
-                    && !Arrays.asList(Number.properties).contains(prop1.toUpperCase())) {
-                System.out.printf("The properties [%s, %s] are wrong.\n", prop1.toUpperCase(), prop2.toUpperCase());
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY]\n");
-                return null;
-            } else if (!Arrays.asList(Number.properties).contains(prop2.toUpperCase())
-                    || !Arrays.asList(Number.properties).contains(prop1.toUpperCase())) {
-                String wrongProp = !Arrays.asList(Number.properties).contains(prop2.toUpperCase())?prop2:prop1;
-                System.out.printf("The property [%s] is wrong.", wrongProp.toUpperCase());
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY]");
-                return null;
-            }
-
-            if (Number.conflictProperties.containsKey(prop1.toLowerCase()) && Number.conflictProperties.get(prop1.toLowerCase()).equals(prop2.toLowerCase())) {
-                System.out.printf("The request contains mutually exclusive properties: " +
-                        "[%s, %s]", prop1.toUpperCase(), prop2.toUpperCase());
-                System.out.println("There are no numbers with these properties.\n");
-                return null;
-            }
-        }
-        return new Parameters(num1, num2, prop1, prop2);
+        return new Parameters(num1, num2, props);
     }
 
     static boolean checkProperty(long num, String prop) {
@@ -87,6 +92,7 @@ public class Main {
             case "odd" -> !Number.checkParity(num);
             case "square" -> Number.checkSquare(num);
             case "sunny" -> Number.checkSquare(num + 1L);
+            case "jumping" -> Number.checkJumping(num);
             default -> false;
         };
     }
@@ -100,6 +106,7 @@ public class Main {
         System.out.print(Number.checkSpy(num)?"spy, ": "");
         System.out.print(Number.checkSquare(num)?"square, ": "");
         System.out.print(Number.checkSquare(num + 1)?"sunny, ": "");
+        System.out.print(Number.checkJumping(num)?"jumping, ": "");
         System.out.print(Number.checkParity(num)?"even\n": "odd\n");
     }
 
@@ -136,36 +143,25 @@ public class Main {
                 System.out.printf("         spy: %b\n", number.isSpy());
                 System.out.printf("      square: %b\n", number.isSquare());
                 System.out.printf("       sunny: %b\n", number.isSunny());
+                System.out.printf("     jumping: %b\n", number.isJumping());
                 System.out.printf("        even: %b\n", number.isEven());
                 System.out.printf("         odd: %b\n", number.isOdd());
             } else if (parameters.getCount() != null
-                    && parameters.getProperty1() == null) {
+                    && parameters.getProps() == null) {
                 for (int i = 0; i < parameters.getCount(); i++) {
                     printProperties(startNumber + i);
                 }
             } else if (parameters.getCount() != null
-                    && parameters.getProperty1() != null
-                    && parameters.getProperty2() == null){
+                    && parameters.getProps() != null) {
                 Long count = parameters.getCount();
-                String prop1 = parameters.getProperty1();
+                String[] props = parameters.getProps();
                 int i = 0;
                 while (count > 0L) {
-                    if (checkProperty(startNumber + i, prop1)) {
-                        printProperties(startNumber + i);
-                        count--;
+                    boolean indicate = true;
+                    for (String prop: props) {
+                        indicate = indicate && checkProperty(startNumber + i, prop);
                     }
-                    i++;
-                }
-            } else if (parameters.getCount() != null
-                    && parameters.getProperty1() != null
-                    && parameters.getProperty2() != null) {
-                Long count = parameters.getCount();
-                String prop1 = parameters.getProperty1();
-                String prop2 = parameters.getProperty2();
-                int i = 0;
-                while (count > 0L) {
-                    if (checkProperty(startNumber + i, prop1)
-                            && checkProperty(startNumber + i, prop2)) {
+                    if (indicate) {
                         printProperties(startNumber + i);
                         count--;
                     }

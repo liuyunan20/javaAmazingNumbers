@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Number {
     public static final String[] properties = {"EVEN", "ODD", "BUZZ",
-            "DUCK", "PALINDROMIC", "GAPFUL", "SPY", "SQUARE", "SUNNY"};
+            "DUCK", "PALINDROMIC", "GAPFUL", "SPY", "SQUARE", "SUNNY", "JUMPING"};
     public static final Map<String, String> conflictProperties =
             new HashMap<>(Map.of("even", "odd",
                     "odd", "even",
@@ -25,6 +25,8 @@ public class Number {
     private final boolean square;
     private final boolean sunny;
 
+    private final boolean jumping;
+
 
     public Number(long number) {
 
@@ -38,6 +40,7 @@ public class Number {
         this.spy = checkSpy(number);
         this.square = checkSquare(number);
         this.sunny = checkSquare(number + 1);
+        this.jumping = checkJumping(number);
     }
 
     public long getNumber() {
@@ -108,6 +111,20 @@ public class Number {
         return x % 1 == 0;
     }
 
+    static boolean checkJumping(long num) {
+        ArrayList<Long> digits = new ArrayList<>();
+        while (num > 0) {
+            digits.add(num % 10);
+            num = num / 10;
+        }
+        for (int i = 0; i < digits.size() - 1; i++) {
+            if (Math.abs(digits.get(i) - digits.get(i + 1)) != 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean isEven() {
         return even;
     }
@@ -142,6 +159,10 @@ public class Number {
 
     public boolean isSunny() {
         return sunny;
+    }
+
+    public boolean isJumping() {
+        return jumping;
     }
 }
 
