@@ -1,11 +1,13 @@
 package numbers;
 
+import java.util.ArrayList;
+
 public class Parameters {
     private final Long startNumber;
     private final Long count;
-    private final String[] props;
+    private final ArrayList<String> props;
 
-    public Parameters(Long startNumber, Long count, String[] props) {
+    public Parameters(Long startNumber, Long count, ArrayList<String> props) {
         this.startNumber = startNumber;
         this.count = count;
         this.props = props;
@@ -19,7 +21,7 @@ public class Parameters {
         return count;
     }
 
-    public String[] getProps() {
+    public ArrayList<String> getProps() {
         return props;
     }
 }

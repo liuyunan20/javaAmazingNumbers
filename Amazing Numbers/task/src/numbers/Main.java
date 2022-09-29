@@ -24,7 +24,7 @@ public class Main {
         String[] input = scanner.nextLine().split(" ");
         Long num1 = checkNaturalNumber(input[0]);
         Long num2 = null;
-        String [] props = null;
+        ArrayList<String> props = null;
         // check if the first number is natural or zero
         if (num1 < 0L) {
             System.out.println("The first parameter should be a natural number or zero.");
@@ -42,18 +42,24 @@ public class Main {
         }
         // check if the input parameters are available number property
         if (input.length > 2) {
-            props = Arrays.copyOfRange(input, 2, input.length);
+            props = new ArrayList<>();
+            // construct props with lowercase string
+            for (int i = 2; i < input.length; i++) {
+                props.add(input[i].toLowerCase());
+            }
             ArrayList<String> wrongProp = new ArrayList<>();
             // check if there is wrong property input
             for (String prop: props) {
-                if (!Arrays.asList(Number.properties).contains(prop.toUpperCase())) {
+                if ((!prop.startsWith("-") && !Arrays.asList(Number.properties).contains(prop))
+                        || (prop.startsWith("-") && !Arrays.asList(Number.properties).contains(prop.substring(1)))) {
                     wrongProp.add(prop);
                 }
             }
             // if there is only one wrong property, print error message and return null
             if (wrongProp.size() == 1) {
                 System.out.printf("The property [%s] is wrong.\n", wrongProp.get(0).toUpperCase());
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]");
+                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, " +
+                        "GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD]");
                 return null;
             }
             // if wrong properties are more, print and return
@@ -64,15 +70,30 @@ public class Main {
                 }
                 errorMsg.append(wrongProp.get(wrongProp.size() - 1));
                 System.out.printf("The properties [%s] are wrong.\n", errorMsg.toString().toUpperCase());
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]\n");
+                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, " +
+                        "GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD]\n");
                 return null;
             }
             // check if there are mutually exclusive properties
             for (String p: props) {
-                if (Number.conflictProperties.containsKey(p.toLowerCase())
-                        && Arrays.asList(props).contains(Number.conflictProperties.get(p.toLowerCase()))) {
+                // check if input direct opposites
+                if (p.startsWith("-") && props.contains(p.substring(1))) {
                     System.out.printf("The request contains mutually exclusive properties: " +
-                            "[%s, %s]\n", p.toUpperCase(), Number.conflictProperties.get(p.toLowerCase()).toUpperCase());
+                            "[%s, %s]\n", p.toUpperCase(), p.substring(1).toUpperCase());
+                    System.out.println("There are no numbers with these properties.\n");
+                    return null;
+                }
+                // check if input mutually exclusive properties
+                if (Number.conflictProperties.containsKey(p) && props.contains(Number.conflictProperties.get(p))) {
+                    System.out.printf("The request contains mutually exclusive properties: " +
+                            "[%s, %s]\n", p.toUpperCase(), Number.conflictProperties.get(p).toUpperCase());
+                    System.out.println("There are no numbers with these properties.\n");
+                    return null;
+                }
+                if (p.startsWith("-") && Number.conflictProperties.containsKey(p.substring(1))
+                        && props.contains("-" + Number.conflictProperties.get(p.substring(1)))) {
+                    System.out.printf("The request contains mutually exclusive properties: " +
+                            "[%s, %s]\n", p.toUpperCase(), "-" + Number.conflictProperties.get(p.substring(1)).toUpperCase());
                     System.out.println("There are no numbers with these properties.\n");
                     return null;
                 }
@@ -93,6 +114,8 @@ public class Main {
             case "square" -> Number.checkSquare(num);
             case "sunny" -> Number.checkSquare(num + 1L);
             case "jumping" -> Number.checkJumping(num);
+            case "happy" -> Number.checkHappy(num);
+            case "sad" -> !Number.checkHappy(num);
             default -> false;
         };
     }
@@ -107,19 +130,21 @@ public class Main {
         System.out.print(Number.checkSquare(num)?"square, ": "");
         System.out.print(Number.checkSquare(num + 1)?"sunny, ": "");
         System.out.print(Number.checkJumping(num)?"jumping, ": "");
-        System.out.print(Number.checkParity(num)?"even\n": "odd\n");
+        System.out.print(Number.checkParity(num)?"even, ": "odd, ");
+        System.out.print(Number.checkHappy(num)?"happy\n": "sad\n");
     }
 
     public static void main(String[] args) {
         System.out.println("""
                 Welcome to Amazing Numbers!
-                                                    
+                
                 Supported requests:
                 - enter a natural number to know its properties;
                 - enter two natural numbers to obtain the properties of the list:
-                  * the first parameter represents a starting number;
-                  * the second parameters show how many consecutive numbers are to be processed;
-                - two natural numbers and two properties to search for;
+                 * the first parameter represents a starting number;
+                 * the second parameter shows how many consecutive numbers are to be printed;
+                - two natural numbers and properties to search for;
+                - a property preceded by minus must not be present in numbers;
                 - separate the parameters with one space;
                 - enter 0 to exit.
                 """);
@@ -133,19 +158,20 @@ public class Main {
             if (startNumber == 0L) {
                 break;
             }
-            Number number = new Number(startNumber);
             if (parameters.getCount() == null) {
-                System.out.printf("Properties of %d\n", number.getNumber());
-                System.out.printf("        buzz: %b\n", number.isBuzz());
-                System.out.printf("        duck: %b\n", number.isDuck());
-                System.out.printf(" palindromic: %b\n", number.isPalindromic());
-                System.out.printf("      gapful: %b\n", number.isGapful());
-                System.out.printf("         spy: %b\n", number.isSpy());
-                System.out.printf("      square: %b\n", number.isSquare());
-                System.out.printf("       sunny: %b\n", number.isSunny());
-                System.out.printf("     jumping: %b\n", number.isJumping());
-                System.out.printf("        even: %b\n", number.isEven());
-                System.out.printf("         odd: %b\n", number.isOdd());
+                System.out.printf("Properties of %d\n", startNumber);
+                System.out.printf("        buzz: %b\n", Number.checkBuzz(startNumber));
+                System.out.printf("        duck: %b\n", Number.checkDuck(startNumber));
+                System.out.printf(" palindromic: %b\n", Number.checkPalindromic(startNumber));
+                System.out.printf("      gapful: %b\n", Number.checkGapful(startNumber));
+                System.out.printf("         spy: %b\n", Number.checkSpy(startNumber));
+                System.out.printf("      square: %b\n", Number.checkSquare(startNumber));
+                System.out.printf("       sunny: %b\n", Number.checkSquare(startNumber + 1));
+                System.out.printf("     jumping: %b\n", Number.checkJumping(startNumber));
+                System.out.printf("        even: %b\n", Number.checkParity(startNumber));
+                System.out.printf("         odd: %b\n", !Number.checkParity(startNumber));
+                System.out.printf("       happy: %b\n", Number.checkHappy(startNumber));
+                System.out.printf("         sad: %b\n", !Number.checkHappy(startNumber));
             } else if (parameters.getCount() != null
                     && parameters.getProps() == null) {
                 for (int i = 0; i < parameters.getCount(); i++) {
@@ -154,12 +180,16 @@ public class Main {
             } else if (parameters.getCount() != null
                     && parameters.getProps() != null) {
                 Long count = parameters.getCount();
-                String[] props = parameters.getProps();
+                ArrayList<String> props = parameters.getProps();
                 int i = 0;
                 while (count > 0L) {
                     boolean indicate = true;
                     for (String prop: props) {
-                        indicate = indicate && checkProperty(startNumber + i, prop);
+                        if (prop.startsWith("-")) {
+                            indicate = indicate && !checkProperty(startNumber + i, prop.substring(1));
+                        } else {
+                            indicate = indicate && checkProperty(startNumber + i, prop);
+                        }
                     }
                     if (indicate) {
                         printProperties(startNumber + i);

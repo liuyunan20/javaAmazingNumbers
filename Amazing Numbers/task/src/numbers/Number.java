@@ -2,50 +2,21 @@ package numbers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Number {
-    public static final String[] properties = {"EVEN", "ODD", "BUZZ",
-            "DUCK", "PALINDROMIC", "GAPFUL", "SPY", "SQUARE", "SUNNY", "JUMPING"};
+    public static final String[] properties = {"even", "odd", "buzz",
+            "duck", "palindromic", "gapful", "spy", "square", "sunny", "jumping", "happy", "sad"};
     public static final Map<String, String> conflictProperties =
             new HashMap<>(Map.of("even", "odd",
                     "odd", "even",
                     "spy", "duck",
                     "duck", "spy",
                     "square", "sunny",
-                    "sunny", "square"));
-    private final long number;
-    private final boolean even;
-    private final boolean odd;
-    private final boolean buzz;
-    private final boolean duck;
-    private final boolean palindromic;
-    private final boolean gapful;
-    private final boolean spy;
-    private final boolean square;
-    private final boolean sunny;
-
-    private final boolean jumping;
-
-
-    public Number(long number) {
-
-        this.number = number;
-        this.even = number % 2 == 0;
-        this.odd = !this.even;
-        this.buzz = number % 7 == 0 || number % 10 == 7;
-        this.duck = checkDuck(number);
-        this.palindromic = checkPalindromic(number);
-        this.gapful = checkGapful(number);
-        this.spy = checkSpy(number);
-        this.square = checkSquare(number);
-        this.sunny = checkSquare(number + 1);
-        this.jumping = checkJumping(number);
-    }
-
-    public long getNumber() {
-        return number;
-    }
+                    "sunny", "square",
+                    "happy", "sad",
+                    "sad", "happy"));
 
     static boolean checkBuzz(long num) {
         return num % 7 == 0 || num % 10 == 7;
@@ -125,44 +96,29 @@ public class Number {
         return true;
     }
 
-    public boolean isEven() {
-        return even;
+    static boolean checkHappy(long num) {
+        HashSet<Long> visited = new HashSet<>();
+        return checkHappyHelper(num, visited);
     }
 
-    public boolean isOdd() {
-        return odd;
-    }
-
-    public boolean isBuzz() {
-        return buzz;
-    }
-
-    public boolean isDuck() {
-        return duck;
-    }
-
-    public boolean isPalindromic() {
-        return palindromic;
-    }
-
-    public boolean isGapful() {
-        return gapful;
-    }
-
-    public boolean isSpy() {
-        return spy;
-    }
-
-    public boolean isSquare() {
-        return square;
-    }
-
-    public boolean isSunny() {
-        return sunny;
-    }
-
-    public boolean isJumping() {
-        return jumping;
+    static boolean checkHappyHelper(long num, HashSet<Long> visited) {
+        if (num == 1) {
+            return true;
+        }
+        ArrayList<Long> digits = new ArrayList<>();
+        long numCopy = num;
+        while (numCopy > 0) {
+            digits.add(numCopy % 10);
+            numCopy = numCopy / 10;
+        }
+        long sum = 0;
+        for (Long d: digits) {
+            sum += d * d;
+        }
+        if (!visited.add(sum)) {
+            return false;
+        }
+        return checkHappyHelper(sum, visited);
     }
 }
 
